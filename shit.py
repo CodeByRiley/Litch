@@ -1,8 +1,8 @@
-
 import git 
+repo = git.Repo('G:\Projects\Coding\Projects\CPLUSPLUS\Tinkering\wabble') 
   
-# Clone a remote repository 
-repo_url = "https://github.com/Hardik-Kushwaha/GIT_Python_Automation"
-local_path = "/home/hardik/GFG_Temp/Cloned_Repo"
-repo = git.Repo.clone_from(repo_url, local_path) 
-print(f'Repository Cloned at location: {local_path}') 
+# Do some changes and commit
+repo.git.add(u=True)
+print('Files Added Successfully') 
+repo.index.commit('Initial commit on new branch') 
+print('Commited successfully')
