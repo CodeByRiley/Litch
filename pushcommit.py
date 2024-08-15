@@ -24,7 +24,7 @@ def git_push(path, repourl, commitmsg, branch, force):
             print(x.new_file)
             print(x.b_path)
             
-        repo.index.add(['*'])
+        repo.git.add(u=True)
         repo.index.commit(str(commitmsg))
         origin = repo.remote(name="origin")
         origin.push()
