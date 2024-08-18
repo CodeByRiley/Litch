@@ -1,1 +1,1 @@
-py push.py G:\Projects\Coding\Projects\CPLUSPLUS\Tinkering\wabble https://github.com/viadot/Litch.git [%1]
+py push.py G:\Projects\Coding\Projects\CPLUSPLUS\Tinkering\wabble https://github.com/viadot/Litch.git %1
