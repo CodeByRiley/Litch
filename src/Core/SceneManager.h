@@ -28,13 +28,13 @@ public:
     glui::RendererUi* ui;
 
 public:
-    void AddScene(std::string, std::unique_ptr<GameScene>);
+    void AddScene(std::string, Scene*);
     void SetScene(std::string);
     Scene* GetScene(std::string);
     void RemoveScene(std::string);
 
-    std::unordered_map<std::string, std::unique_ptr<GameScene>> Scenes;
-    std::unique_ptr<GameScene> curScene;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> Scenes;
+    std::shared_ptr<Scene> curScene;
 };
 
 

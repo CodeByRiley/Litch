@@ -5,6 +5,7 @@
 #include <iostream>
 #include "globals.h"
 #include "glui/glui.h"
+
 #if REMOVE_IMGUI == 0
 #include "imgui.h"
 #endif

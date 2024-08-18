@@ -33,6 +33,14 @@ void SceneManager::StartScene()
 }
 void SceneManager::UpdateScene()
 {
+    if(GetKeyPressed() == KEY_ENTER) {
+        std::cout<<"Enter Pressed";
+        if(this->GetScene("Game") == this->curScene.get()) {
+            this->SetScene("Menu");
+        } else {
+            this->SetScene("Game");
+        }
+    }
     this->curScene->Update();
 }
 void SceneManager::FixedUpdateScene(float dT)
@@ -51,7 +59,7 @@ void SceneManager::DrawScene()
     }
     this->curScene->Draw();
 }
-void SceneManager::AddScene(std::string name, std::unique_ptr<GameScene> scene)
+void SceneManager::AddScene(std::string name, Scene* scene)
 {
     if(!this->Scenes.empty()) {
         if(this->Scenes.find(name) != this->Scenes.end()) {
@@ -59,7 +67,6 @@ void SceneManager::AddScene(std::string name, std::unique_ptr<GameScene> scene)
             return;
         }
     }
-    scene->LoadScene();
     this->Scenes.insert(std::make_pair(name, std::move(scene)));
 }
 void SceneManager::SetScene(std::string name) {
@@ -71,9 +78,11 @@ void SceneManager::SetScene(std::string name) {
         std::cout << "Scene with name " << name << " does not exist" << std::endl;
         return;
     }
-    if(this->curScene != nullptr)
+    if(this->curScene != nullptr) {
+        this->curScene->changingScene = true;
         this->curScene->UnloadScene();
-    this->curScene = std::make_unique<GameScene>(*this->Scenes[name].get());
+    }
+    this->curScene = this->Scenes[name];
     this->curScene->LoadScene();
 }
 Scene* SceneManager::GetScene(std::string name)

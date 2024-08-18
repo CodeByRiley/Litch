@@ -1,7 +1,8 @@
 #include "GameScene.h"
-
+#include "../Game.h"
 GameScene::GameScene(std::string name, gl2d::Renderer2D &renderer, glui::RendererUi &ui) : Scene(renderer, ui) {
     this->name = name;
+    std::cout<<"Creating "<<name<<std::endl;
     this->renderer = &renderer;
     this->ui = &ui;
 }
@@ -10,97 +11,84 @@ GameScene::~GameScene() {
 }
 
 void GameScene::LoadScene() {
-    std::cout<<"Gamers";
-    font.createFromFile(RESOURCES_PATH "assets/fonts/roboto_black.ttf");
+    std::cout<<"Loading Game"<<std::endl;
+    this->toggleTextureUnTicked = gl2d::Texture(RESOURCES_PATH "assets/textures/ui/check_square_grey.png", false);
+    this->toggleTextureTicked = gl2d::Texture(RESOURCES_PATH "assets/textures/ui/check_square_grey_checkmark.png", false);
+    this->font.createFromFile(RESOURCES_PATH "assets/fonts/roboto_black.ttf");
     this->buttonClick = LoadSound(RESOURCES_PATH "audio/ui/click_002.ogg");
     this->toggleClick = LoadSound(RESOURCES_PATH "audio/ui/click_005.ogg");
     this->untoggleClick = LoadSound(RESOURCES_PATH "audio/ui/click_003.ogg");
     this->menuReturn = LoadSound(RESOURCES_PATH "audio/ui/click_002.ogg");
     this->music = LoadMusicStream(RESOURCES_PATH "audio/music/simple-bgm1.wav");
-    this->toggleTextureUnTicked = gl2d::Texture(RESOURCES_PATH "assets/textures/ui/check_square_grey.png", false);
-    this->toggleTextureTicked = gl2d::Texture(RESOURCES_PATH "assets/textures/ui/check_square_grey_checkmark.png", false);
+    this->changingScene = false;
     this->SceneLoaded = true;
 }
 
 void GameScene::UnloadScene() {
+    std::cout<<"Unloading Game"<<std::endl;
+    this->SceneLoaded = false;
+    this->toggleTextureUnTicked.cleanup();
+    this->toggleTextureTicked.cleanup();
+    this->font.cleanup();
+    UnloadMusicStream(music);
+    UnloadSound(buttonClick);
+    UnloadSound(toggleClick);
+    UnloadSound(untoggleClick);
+    UnloadSound(menuReturn);
 
 }
-
-
 void GameScene::Update() {
-    SetMusicVolume(music, (MusicVolume/100));
-    UpdateMusicStream(music);
+    if(music.ctxData != nullptr && !changingScene && SceneLoaded) {
+        SetMusicVolume(music, (MusicVolume / 100));
+        UpdateMusicStream(music);
+    }
 
-
-
+    if(vsync == true && usingVsync == false) {
+        Game::Get().UpdateWindowState(FLAG_VSYNC_HINT, vsync);
+        usingVsync = true;
+    } else if (vsync == false && usingVsync == true) {
+        Game::Get().UpdateWindowState(FLAG_VSYNC_HINT, vsync);
+        usingVsync = false;
+    }
 }
 float timer;
+int rX,rY;
+int rXV = 1;
+int rYV = 1;
 void GameScene::FixedUpdate(float dT) {
     timer += 1 * dT;
     if(timer >= 1.0F) {
-        std::cout<<"FPS: "<<1.0F/dT<<std::endl;
-        std::cout<<"FrameTime: "<<dT<<std::endl;
         timer = 0;
     }
-}
 
+    rX += rXV;
+    rY += rYV;
+    if(rX >= GetScreenWidth() || rX < 0)
+        rXV = -rXV;
+    if(rY >= GetScreenHeight() || rY < 0)
+        rYV = -rYV;
+}
+void DrawFPS(int posX, int posY, Color color1) {
+    Color color = color1;
+    int fps = GetFPS();
+
+    if ((fps < 30) && (fps >= 15)) color = RED;  // Warning FPS
+    else if (fps < 15) color = BLACK;             // Low FPS
+
+    DrawText(TextFormat("%2i FPS", fps), posX, posY, 20, color);
+}
 void GameScene::Draw() {
     BeginDrawing();
     ClearBackground(GRAY);
-    DrawFPS(10, 10);
-    DrawText("Game Scene", 10, 10, 20, DARKGRAY);
+    DrawFPS(10, 10, ORANGE);
+    DrawRectangle(rX, rY, 20, 20, BLACK);
+    DrawText("Game Scene", 10, 40, 20, DARKGRAY);
     this->DrawUI();
     EndDrawing();
 }
 
+
+
 void GameScene::DrawUI() {
-    if(this->SceneLoaded) {
-#pragma region GLUI
-        this->renderer->updateWindowMetrics(GetRenderWidth(),GetRenderHeight());
-        this->ui->Begin(100);
-
-        this->ui->SetAlignModeFixedSizeWidgets({0, 100});
-        if(this->ui->Button("Play", &buttonClick)) {
-            PlayMusicStream(music);
-        }
-        if(this->ui->Button("Pause", &buttonClick)) {
-            PauseMusicStream(music);
-        }
-        if(this->ui->Button("Stop", &buttonClick)) {
-            StopMusicStream(music);
-        }
-
-
-        this->ui->BeginMenu("Settings", &buttonClick,Colors_Transparent, texture);
-        this->ui->BeginMenu("Sound settings", &buttonClick,Colors_Transparent, texture);
-        this->ui->sliderFloatNoDecimal("Music volume", &MusicVolume, 0, 100, Colors_White);
-        if(this->ui->Button("Back", &menuReturn)) {
-            this->ui->returnBack();
-        }
-        this->ui->EndMenu();
-        this->ui->BeginMenu("Video settings", &buttonClick,Colors_Transparent, texture);
-        this->ui->DualToggle("vSync", &toggleClick, &untoggleClick,Colors_Gray, &vsync, toggleTextureTicked, toggleTextureUnTicked, 25.f);
-        this->ui->DualToggle("Bro", &toggleClick, &untoggleClick,Colors_Gray, &vsync, toggleTextureTicked, toggleTextureUnTicked, 55.f);
-        this->ui->DualToggle("Bro##2", &toggleClick, &untoggleClick,Colors_Gray, &vsync, toggleTextureTicked, toggleTextureUnTicked, 55.f);
-        if(this->ui->Button("Back", &menuReturn)) {
-            this->ui->returnBack();
-        }
-        this->ui->EndMenu();
-        if(this->ui->Button("Back", &menuReturn)) {
-            this->ui->returnBack();
-        }
-        this->ui->EndMenu();
-        if(ui->Button("Quit", nullptr)) {
-            this->wantsToQuit = true;
-        }
-        this->ui->End();
-
-        this->ui->renderFrame(*renderer, font, glm::vec2(GetMousePosition().x, GetMousePosition().y),
-                       IsMouseButtonPressed(MOUSE_BUTTON_LEFT), IsMouseButtonDown(MOUSE_BUTTON_LEFT), IsMouseButtonReleased(MOUSE_BUTTON_LEFT),
-                       "", GetFrameTime(),IsKeyReleased(KEY_BACKSPACE));
-        this->renderer->flush();
-
-#pragma endregion
-    }
 
 }

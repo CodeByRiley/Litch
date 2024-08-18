@@ -1,20 +1,16 @@
 #include "Game.h"
 
-
-#define RAUDIOEXTENSIONS_IMPLEMENTATION
+Game Game::s_Instance;
 gl2d::Renderer2D renderer;
 glui::RendererUi ui;
 gl2d::Font font;
-gl2d::Texture texture;
-Sound buttonClick;
-Music music;
-float MusicVolume = 100;
-bool vsync = false;
-bool usingVsync = false;
 
-Game::Game()
-{
+SceneManager* sceneManager;
+
+Game::Game() {
+    s_Instance = *this;
 }
+
 void Game::Create(const char* title, int w, int h)
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -35,16 +31,18 @@ void Game::Create(const char* title, int w, int h)
     this->ShouldUpdate = true;
 
     font.createFromFile(RESOURCES_PATH "assets/fonts/roboto_black.ttf");
-    buttonClick = LoadSound(RESOURCES_PATH "audio/beans.wav");
-    music = LoadMusicStream(RESOURCES_PATH "audio/scotty-scotty.wav");
-    texture.loadFromFile(RESOURCES_PATH "assets/textures/ui/ui0.png", true);
 
+    auto menu = new MenuScene("Menu", renderer, ui);
     auto game = new GameScene("Game", renderer, ui);
-    this->sceneManager->AddScene(game->name, std::make_unique<GameScene>(*game));
-    delete game;
+    std::cout<<menu->name<<std::endl;
+    std::cout<<game->name<<std::endl;
+    this->sceneManager->AddScene("Game", (Scene*)game);
+    this->sceneManager->AddScene("Menu", (Scene*)menu);
     this->sceneManager->SetScene("Game");
     this->sceneManager->StartScene();
+
 }
+
 void Game::Loop()
 {
     if(this->ShouldUpdate) {
@@ -63,6 +61,10 @@ void Game::Update() {
     }
     this->Render();
     if(this->sceneManager->curScene->wantsToQuit) {
+        for(auto& scene : this->sceneManager->Scenes) {
+            scene.second->UnloadScene();
+        }
+        this->sceneManager->Scenes.clear();
         this->Destroy();
     }
 }
@@ -73,6 +75,18 @@ void Game::FixedUpdate(float dT)
 void Game::Render()
 {
     this->sceneManager->DrawScene();
+}
+
+void Game::UpdateWindowState(unsigned int flag, bool state)
+{
+    if(state) {
+        std::cout<<"Setting Window State: "<<flag<<": "<<state<<std::endl;
+
+        SetWindowState(flag);
+    } else {
+        std::cout<<"Clearing Window State: "<<flag<<": "<<state<<std::endl;
+        ClearWindowState(flag);
+    }
 }
 
 void Game::Destroy()

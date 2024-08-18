@@ -31,7 +31,12 @@ private:
     bool SceneLoaded = false;
     gl2d::Font font;
     gl2d::Texture texture;
+    gl2d::Texture toggleTextureUnTicked;
+    gl2d::Texture toggleTextureTicked;
     Sound buttonClick;
+    Sound menuReturn;
+    Sound toggleClick;
+    Sound untoggleClick;
     Music music;
 };
 

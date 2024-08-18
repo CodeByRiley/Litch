@@ -33,6 +33,7 @@ public:
 
 public:
     bool wantsToQuit = false;
+    bool changingScene = false;
 };
 
 
