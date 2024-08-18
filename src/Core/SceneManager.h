@@ -11,12 +11,12 @@ class SceneManager {
 
 public:
     SceneManager(gl2d::Renderer2D&, glui::RendererUi&);
-
     SceneManager();
-
     ~SceneManager();
+
 public:
     void Init();
+    void Unload();
     void StartScene();
     void UpdateScene();
     void FixedUpdateScene(float);

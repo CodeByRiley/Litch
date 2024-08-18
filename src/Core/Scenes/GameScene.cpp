@@ -47,6 +47,7 @@ void GameScene::FixedUpdate(float dT) {
 void GameScene::Draw() {
     BeginDrawing();
     ClearBackground(GRAY);
+    DrawFPS(10, 10);
     DrawText("Game Scene", 10, 10, 20, DARKGRAY);
     this->DrawUI();
     EndDrawing();

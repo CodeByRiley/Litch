@@ -41,6 +41,7 @@ void Game::Create(const char* title, int w, int h)
 
     auto game = new GameScene("Game", renderer, ui);
     this->sceneManager->AddScene(game->name, std::make_unique<GameScene>(*game));
+    delete game;
     this->sceneManager->SetScene("Game");
     this->sceneManager->StartScene();
 }
@@ -79,6 +80,7 @@ void Game::Destroy()
     renderer.cleanup();
     gl2d::clearnup();
     CloseAudioDevice();
+    delete this->sceneManager;
     this->ShouldUpdate = false;
     this->Running = false;
 }

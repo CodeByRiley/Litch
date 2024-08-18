@@ -16,10 +16,14 @@ SceneManager::~SceneManager()
     for(auto& scene : this->Scenes) {
         scene.second->UnloadScene();
     }
-    this->Scenes.clear();
     this->curScene = nullptr;
+    this->Scenes.clear();
 }
 void SceneManager::Init()
+{
+
+}
+void SceneManager::Unload()
 {
 
 }
