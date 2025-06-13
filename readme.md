@@ -23,11 +23,10 @@ Meant to be an Action-RPG / Roguelike.
         - [ ] Sprite
         - [ ] Collider
        - [ ] RigidBody
-  - [ ] Physics Engine
   - [ ] AI System
   - [ ] Procedural Dungeon Generation
   - [ ] Basic Combat System
-  - [ ] Inventory System
+  - [ ] Inventory / Card System
 
     ## Maybe?
     ## HARD!!
