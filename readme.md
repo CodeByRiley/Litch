@@ -27,10 +27,9 @@ Meant to be an Action-RPG / Roguelike.
   - [ ] Procedural Dungeon Generation
   - [ ] Basic Combat System
   - [ ] Inventory / Card System
+  - [ ] Saving
 
     ## Maybe?
-    ## HARD!!
-      - [ ] Save System
       - [ ] Multiplayer
       - [ ] Modding Support
 
